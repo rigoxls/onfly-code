@@ -3,13 +3,13 @@ var env = process.env.NODE_EV || 'production',
     swig = require('swig'),
     middlewares = require('../app/middlewares/admin');
 
-var ExpressServer = function(config){
+    var ExpressServer = function(config){
     config = config || {};
 
     this.expressServer = express();
 
     //working with middlewares
-    for (var middleware in middleware){
+    for (var middleware in middlewares){
         this.expressServer.use(middlewares[middleware]);
     }
 
@@ -32,6 +32,7 @@ var ExpressServer = function(config){
         var object = {init: 'show message init'};
         res.render('home', object);
     });
+
 };
 
 module.exports = ExpressServer;
