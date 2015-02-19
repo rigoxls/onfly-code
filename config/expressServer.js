@@ -18,7 +18,7 @@ var ExpressServer = function(config){
     this.expressServer.set('view engine', 'html');
 
     //where templates are located
-    this.expressServer.set('views', __dirname + '/../app/views/templates');
+    this.expressServer.set('views', __dirname + '/../app/default/views/templates');
 
     //if environment is equals to development, we disable cache engine
     if(env == 'development'){
