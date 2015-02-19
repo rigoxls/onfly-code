@@ -2,10 +2,6 @@
   "name": "onFlyCode",
   "version": "1.0.1",
   "description": "It's a tool to check code between partners in real time",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/rigoxls/onfly-code.git"

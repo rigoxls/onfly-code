@@ -1,9 +1,10 @@
 var http = require('http'),
-    conf = require('./conf'),
-    expressServer = require('./app/expressServer');
+    conf = require('./config/conf'),
+    expressServer = require('./config/expressServer');
 
-    var app = new expressServer();
 
-    var server = http.createServer(app.expressServer);
+var app = new expressServer();
 
-    server.listen(conf.port);
+var server = http.createServer(app.expressServer);
+
+server.listen(conf.port);

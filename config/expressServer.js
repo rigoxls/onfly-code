@@ -1,7 +1,7 @@
 var env = process.env.NODE_EV || 'production',
     express = require('express'),
     swig = require('swig'),
-    middlewares = require('./middlewares/admin'),
+    middlewares = require('../app/middlewares/admin');
 
 var ExpressServer = function(config){
     config = config || {};
@@ -18,7 +18,7 @@ var ExpressServer = function(config){
     this.expressServer.set('view engine', 'html');
 
     //where templates are located
-    this.expressServer.set('views', __dirname + '/app/views/templates');
+    this.expressServer.set('views', __dirname + '/../app/views/templates');
 
     //if environment is equals to development, we disable cache engine
     if(env == 'development'){
