@@ -12,9 +12,62 @@
 <script src="/ace-editor/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
     var editor = ace.edit("editor");
+    var Range = ace.require("ace/range").Range
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/javascript");
     document.getElementById('editor').style.fontSize='14px';
+
+    //create a connection with socket, by default io variable is sponsor by socket lib
+    var socket = io.connect('http://localhost:3000');
+
+    socket.on('editor_broadcast', function(data){
+
+        var newText = ' ';
+        console.info('editor broadcast gotten');
+        console.info(data.newText);
+
+        if(data.action === "insertText"){
+            newText = data.newText;
+            /*editor.session.replace(new Range(data.sRow, data.sColumn, data.eRow, data.eColumn), newText);*/
+            editor.session.insert({row: data.sRow, column: data.sColumn}, newText);
+
+        }else if(data.action === "removeText"){
+            editor.session.remove(new Range(data.sRow, data.sColumn, data.eRow, data.eColumn));
+        }
+
+    });
+
+    editor.getSession().on('change', function(e) {
+        if (editor.curOp && editor.curOp.command.name){
+                console.info('editor change sent');
+                console.info(e);
+                socket.emit('editor_change',
+                    {
+                      newText: e.data.text,
+                      sRow: e.data.range.start.row,
+                      sColumn: e.data.range.start.column,
+                      eRow: e.data.range.end.row,
+                      eColumn: e.data.range.end.column,
+                      action: e.data.action
+                    });
+        }
+    });
+
+    editor.on('paste', function(e) {
+        console.info('editor paste sent');
+        console.info(e);
+        /*socket.emit('editor_change',
+            {
+              newText: e.data.text,
+              sRow: e.data.range.start.row,
+              sColumn: e.data.range.start.column,
+              eRow: e.data.range.end.row,
+              eColumn: e.data.range.end.column,
+              action: e.data.action
+            });*/
+    });
+
+
 </script>
 
 
