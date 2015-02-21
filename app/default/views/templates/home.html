@@ -4,84 +4,49 @@
     <p>{{ init }}</p>
 
 
-<div id="editor" style="width: 80%">
-
-</div>
+<div id="editor" style="width: 80%">function foo(items) {
+    var x = "All this is syntax highlighted";
+    return x;
+}</div>
 
 <script src="/ace-editor/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
     var editor = ace.edit("editor");
     var Range = ace.require("ace/range").Range
+
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/javascript");
     document.getElementById('editor').style.fontSize='14px';
+
+    editor.silence = false;
 
     //create a connection with socket, by default io variable is sponsor by socket lib
     var socket = io.connect('http://localhost:3000');
 
     socket.on('editor_broadcast', function(data){
 
-        //editor.silent, we need to control action when user paste a document
-        //silent , true means receptor client avoid to emit any action while paste action
-        //from any broadcast
-        editor.silent = true;
-
         var newText = ' ';
         console.info('editor broadcast gotten');
         console.info(data.newText);
 
-        if(data.action === "insertText" || data.action === "insertLines"){
-            newText = data.newText;
-            /*editor.session.replace(new Range(data.sRow, data.sColumn, data.eRow, data.eColumn), newText);*/
-            editor.session.insert({row: data.sRow, column: data.sColumn}, newText);
+        editor.silence = true;
 
-        }else if(data.action === "removeText" || data.action === "removeLines"){
-            editor.session.remove(new Range(data.sRow, data.sColumn, data.eRow, data.eColumn));
-        }
-        editor.silent = false;
+        var cursorPos = editor.getCursorPosition();
+        editor.setValue(data.newText, 1);
+        editor.moveCursorToPosition(cursorPos);
+
+        editor.silence = false;
+
     });
 
-    editor.on('paste', function(e) { editor.silent = false });
-
     editor.getSession().on('change', function(e) {
-
-        console.info('onChange');
-        console.info(e);
-
-        //we need to prevent a infinite loop in receptor client and avoid
-        //activate onchange method after broadcast values
-        //if command.name or sequenceStarTime means onchange method is called from emisor client
-        if (editor.curOp && editor.curOp.command.name || !editor.silent){
-            console.info('editor change sent');
-            console.info(e);
-
-            //basic emit object with columns, action
-            var emitObject = {
-              sRow: e.data.range.start.row,
-              sColumn: e.data.range.start.column,
-              eRow: e.data.range.end.row,
-              eColumn: e.data.range.end.column,
-              action: e.data.action
-            }
-
-            //in case of paste we need to check
-            //and change the way how data is inserted
-            if(e.data.lines !== undefined){
-                var lines = e.data.lines;
-                var textLines = '';
-
-                for(var i in lines){
-                    textLines = textLines + lines[i] + "\n";
-                }
-
-                emitObject.newText = textLines;
-                socket.emit('editor_change', emitObject);
-
-            // otherwise user is typing
-            }else{
-                emitObject.newText = e.data.text;
-                socket.emit('editor_change', emitObject);
-            }
+        if (editor.curOp && editor.curOp.command.name || !editor.silence){
+                console.info('editor change sent');
+                console.info(e);
+                socket.emit('editor_change',
+                    {
+                      newText: editor.getValue()
+                    });
         }
     });
 

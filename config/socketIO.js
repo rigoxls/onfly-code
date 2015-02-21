@@ -11,11 +11,6 @@ var SocketIO = function(config){
             socket.broadcast.emit('editor_broadcast',
                 {
                     newText: data.newText,
-                    sRow: data.sRow,
-                    sColumn: data.sColumn,
-                    eRow: data.eRow,
-                    eColumn: data.eColumn,
-                    action: data.action
                 });
         });
     });
