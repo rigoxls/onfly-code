@@ -49,3 +49,31 @@ body{
     margin-right: 3px;
     padding: 2px 25px;
 }
+
+ul.chat-list{
+    padding:0;
+    list-style: none;
+}
+
+li.line{
+    border: 1px solid;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 12px;
+    min-height: 30px;
+}
+
+li.right{
+    margin-left:35px;
+    background-color: dimgrey;
+}
+
+li.left{
+    margin-right:35px;
+    background-color: darkslateblue;
+}
+
+li img{
+    float: left;
+    margin-right: 6px;
+}
