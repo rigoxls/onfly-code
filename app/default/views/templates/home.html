@@ -1,13 +1,31 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <p>{{ init }}</p>
-
 
 <div id="editor" style="width: 80%">function foo(items) {
     var x = "All this is syntax highlighted";
     return x;
 }</div>
+
+<div id="chat-box">
+    <ul>
+        <li>
+            este es el chateste es el chateste es el chateste es el chateste es el chateste es el chateste es el chat
+        </li>
+    </ul>
+
+</div>
+<div id="chat-message">
+
+    <div id="chat-text">
+        <input type="text" id="text-area">
+    </div>
+
+    <div id="chat-text" >
+    <button id="send" > Enviar</button>
+    </div>
+
+</div>
 
 <script src="/ace-editor/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
