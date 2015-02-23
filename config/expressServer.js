@@ -1,6 +1,7 @@
 var env = process.env.NODE_EV || 'production',
     express = require('express'),
     swig = require('swig'),
+    bodyParser = require('body-parser'),
     middlewares = require('../app/middlewares/admin'),
     controllersManager = require('../app/default/controllers/controllersManager'),
     controllers = [];
@@ -9,6 +10,8 @@ var env = process.env.NODE_EV || 'production',
     config = config || {};
 
     this.expressServer = express();
+
+    this.expressServer.use(bodyParser.urlencoded({extended: true}));
 
     //working with middlewares
     for (var middleware in middlewares){
@@ -39,9 +42,13 @@ var env = process.env.NODE_EV || 'production',
         controllers['default'].response('home', req, res, next);
     });
 
-    this.expressServer.get('/room/', function(req, res, next){
-        var object = {init : 'room route'};
-        res.render('room', object);
+    this.expressServer.post('/go_room/', function(req, res, next){
+        controllers['default'].response('go_room', req, res, next);
+    });
+
+
+    this.expressServer.get('/room/:id', function(req, res, next){
+        controllers['default'].response('room', req, res, next);
     });
 
 };
