@@ -1,82 +1,57 @@
-{% extends 'layout.html' %}
+<html>
+<head>
+    <title>OnFly Code, create a room an share your code with your partners ...</title>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
+    <script href="/js/jquery-1.11.2.min.js" type="text/javascript"></script>
 
-{% block content %}
-
-<div id="editor" style="width: 80%">function foo(items) {
-    var x = "All this is syntax highlighted";
-    return x;
-}</div>
-
-<div id="chat-box">
-    <ul class="chat-list">
-        <li class="right line">
-            <img src="http://findicons.com/files/icons/1072/face_avatars/300/a02.png" width="30">
-            <strong>Rigo :</strong>
-            este es el chateste es el chateste es el chateste es el chateste es el chateste es el chateste es el chat
-        </li>
-
-        <li class="left line">
-            <strong>Yuly :</strong>
-            <img src="http://findicons.com/files/icons/1072/face_avatars/300/fh02.png" width="30">
-            si me parece muy bien lo que dices
-        </li>
-    </ul>
-
-</div>
-<div id="chat-message">
-
-    <div id="chat-text">
-        <input type="text" id="text-area">
-    </div>
-
-    <div id="chat-text" >
-    <button id="send" > Enviar</button>
-    </div>
-
-</div>
-
-<script src="/ace-editor/ace.js" type="text/javascript" charset="utf-8"></script>
-<script>
-    var editor = ace.edit("editor");
-    var Range = ace.require("ace/range").Range
-
-    editor.setTheme("ace/theme/monokai");
-    editor.getSession().setMode("ace/mode/javascript");
-    document.getElementById('editor').style.fontSize='14px';
-
-    editor.silence = false;
-
-    //create a connection with socket, by default io variable is sponsor by socket lib
-    var socket = io.connect('http://localhost:3000');
-
-    socket.on('editor_broadcast', function(data){
-
-        var newText = ' ';
-        console.info('editor broadcast gotten');
-        console.info(data.newText);
-
-        editor.silence = true;
-
-        var cursorPos = editor.getCursorPosition();
-        editor.setValue(data.newText, 1);
-        editor.moveCursorToPosition(cursorPos);
-
-        editor.silence = false;
-
-    });
-
-    editor.getSession().on('change', function(e) {
-        if (editor.curOp && editor.curOp.command.name || !editor.silence){
-                console.info('editor change sent');
-                console.info(e);
-                socket.emit('editor_change',
-                    {
-                      newText: editor.getValue()
-                    });
+    <style type="text/css">
+        body {
+            background-color: #d9dee2;
+            font-family: 'Ubuntu', sans-serif;
+            color: #444;
         }
-    });
 
-</script>
+        #login{
+            height: 310px;
+            width: 400px;
+            margin: -150px 0 0 -230px;
+            padding: 30px;
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 7px 9px 70px;
+        }
 
+        input{
+            padding: 15px 15px 15px 15px;
+            margin: 0 0 10px 0;
+            width: 353px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
 
-{% endblock %}
+        input[type=submit]{
+            font-size: 25px;
+        }
+
+        fieldset{
+            border : none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<form id="login">
+    <h1>Create Room</h1>
+    <fieldset id="inputs">
+        <input id="nickname" type="text" placeholder="Nickname" autofocus="" required="">
+        <input id="email" type="email" placeholder="Email" required="">
+    </fieldset>
+    <fieldset id="actions">
+        <input type="submit" id="submit" value="Get in !!">
+    </fieldset>
+</form>
