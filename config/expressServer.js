@@ -1,7 +1,9 @@
 var env = process.env.NODE_EV || 'production',
     express = require('express'),
     swig = require('swig'),
-    middlewares = require('../app/middlewares/admin');
+    middlewares = require('../app/middlewares/admin'),
+    controllersManager = require('../app/default/controllers/controllersManager'),
+    controllers = [];
 
     var ExpressServer = function(config){
     config = config || {};
@@ -27,10 +29,19 @@ var env = process.env.NODE_EV || 'production',
         swig.setDefaults({cache: false});
     }
 
-    //define some static routes
+    //instance all controllers
+    for(var cm in controllersManager){
+        controllers[cm] = new controllersManager[cm];
+    }
+
+    //define some routes
     this.expressServer.get('/home/', function(req, res, next){
-        var object = {init: 'show message init'};
-        res.render('home', object);
+        controllers['default'].response('home', req, res, next);
+    });
+
+    this.expressServer.get('/room/', function(req, res, next){
+        var object = {init : 'room route'};
+        res.render('room', object);
     });
 
 };
