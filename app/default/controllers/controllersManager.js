@@ -1,3 +1,3 @@
 module.exports = {
-    default : require('./default.js')
+    defaultController : require('./defaultController.js')
 }

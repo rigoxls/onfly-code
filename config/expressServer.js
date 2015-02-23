@@ -39,16 +39,16 @@ var env = process.env.NODE_EV || 'production',
 
     //define some routes
     this.expressServer.get('/home/', function(req, res, next){
-        controllers['default'].response('home', req, res, next);
+        controllers['defaultController'].response('home', req, res, next);
     });
 
     this.expressServer.post('/go_room/', function(req, res, next){
-        controllers['default'].response('go_room', req, res, next);
+        controllers['defaultController'].response('go_room', req, res, next);
     });
 
 
     this.expressServer.get('/room/:id', function(req, res, next){
-        controllers['default'].response('room', req, res, next);
+        controllers['defaultController'].response('room', req, res, next);
     });
 
 };
