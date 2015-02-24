@@ -7,8 +7,14 @@ var SocketIO = function(config){
     var io = Io.listen(config.server);
 
     io.sockets.on('connection', function(socket){
+
+        //create a room
+        socket.on('create', function(roomId){
+            socket.join(roomId);
+        });
+
         socket.on('editor_change', function(data){
-            socket.broadcast.emit('editor_broadcast',
+            socket.broadcast.to(data.roomId).emit('editor_broadcast',
                 {
                     newText: data.newText,
                 });

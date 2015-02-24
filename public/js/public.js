@@ -12,6 +12,9 @@
     //create a connection with socket, by default io variable is sponsor by socket lib
     var socket = io.connect('http://localhost:3000');
 
+    //join room, roomId gotten from template
+    socket.emit('create', roomId);
+
     socket.on('editor_broadcast', function(data){
 
         var newText = ' ';
@@ -34,7 +37,8 @@
                 console.info(e);
                 socket.emit('editor_change',
                     {
-                      newText: editor.getValue()
+                      newText: editor.getValue(),
+                      roomId: roomId
                     });
         }
     });
