@@ -16,6 +16,7 @@ Default.prototype.go_room = function(req, res, next, io){
 
     req.session.userName = req.body.username || {};
     req.session.userEmail = req.body.email || {};
+    req.session.roomId = null;
 
     console.info("go room entrance");
 
@@ -26,13 +27,28 @@ Default.prototype.go_room = function(req, res, next, io){
 
 Default.prototype.room = function(req, res, next, io){
 
+    var roomId = req.params.id;
+
+    //if no room id, go directly to login
+    if(_.isUndefined(roomId)){
+        res.redirect('/home/');
+    }
+
     //if credentials are empty redirect to login zone
     if(_.isEmpty(req.session.userName) || _.isEmpty(req.session.userEmail)){
+        res.redirect('/home/' + roomId);
+    }
+    //user is trying to create another session that current one
+    else if(req.session.roomId !== null && req.session.roomId !== roomId){
+        req.session.destroy();
         res.redirect('/home/');
-    }else{
+    }
+    //assign session->roomId and show room
+    else{
         console.info(req.session.userName);
         console.info(req.session.userEmail);
-        var object = {roomId: req.params.id};
+        req.session.roomId = roomId;
+        var object = {roomId: roomId};
         res.render('room', object);
     }
 
@@ -45,6 +61,6 @@ Default.prototype.room = function(req, res, next, io){
                 });
         });
     });*/
-}
+};
 
 module.exports = Default;

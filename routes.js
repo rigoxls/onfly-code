@@ -10,7 +10,7 @@ var Routes = function(app, io){
         controllers[cm] = new controllersManager[cm];
     }
 
-    app.expressServer.get('/home/', function(req, res, next){
+    app.expressServer.get('/home/:id?', function(req, res, next){
         controllers['defaultController'].response('home', req, res, next, io);
     });
 
