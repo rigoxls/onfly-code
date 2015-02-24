@@ -14,6 +14,8 @@ var SocketIO = function(config){
                 });
         });
     });
+
+    return io;
 }
 
 module.exports = SocketIO;
