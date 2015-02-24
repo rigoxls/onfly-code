@@ -1,10 +1,7 @@
 var randomToken = require('random-token');
+var _ = require('lodash');
 
 var Default = function(){
-
-    this.userName = null;
-    this.userEmail = null;
-
     this.response = function(action, req, res, next, io){
         this[action](req, res, next, io);
     }
@@ -16,14 +13,28 @@ Default.prototype.home = function(req, res, next, io){
 };
 
 Default.prototype.go_room = function(req, res, next, io){
+
+    req.session.userName = req.body.username || {};
+    req.session.userEmail = req.body.email || {};
+
+    console.info("go room entrance");
+
     //generate token room
     var token = randomToken(30);
     res.redirect('/room/' + token);
 }
 
 Default.prototype.room = function(req, res, next, io){
-    var object = {roomId: req.params.id};
-    res.render('room', object);
+
+    //if credentials are empty redirect to login zone
+    if(_.isEmpty(req.session.userName) || _.isEmpty(req.session.userEmail)){
+        res.redirect('/home/');
+    }else{
+        console.info(req.session.userName);
+        console.info(req.session.userEmail);
+        var object = {roomId: req.params.id};
+        res.render('room', object);
+    }
 
 //toi check with sockets
 /*    Io.sockets.on('connection', function(socket){

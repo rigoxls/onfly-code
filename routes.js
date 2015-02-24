@@ -15,7 +15,6 @@ var Routes = function(app, io){
     });
 
     app.expressServer.post('/go_room/', function(req, res, next){
-        console.info(req.body);
         controllers['defaultController'].response('go_room', req, res, next);
     });
 

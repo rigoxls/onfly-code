@@ -2,6 +2,7 @@ var env = process.env.NODE_EV || 'production',
     express = require('express'),
     swig = require('swig'),
     bodyParser = require('body-parser'),
+    session = require('express-session'),
     middlewares = require('../app/middlewares/admin');
 
 
@@ -11,6 +12,12 @@ var env = process.env.NODE_EV || 'production',
         this.expressServer = express();
 
         this.expressServer.use(bodyParser.urlencoded({extended: true}));
+
+        this.expressServer.use(session({
+          secret: 'onflycode-session-secret',
+          resave: false,
+          saveUninitialized: false
+        }));
 
         //working with middlewares
         for (var middleware in middlewares){
