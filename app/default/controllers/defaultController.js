@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var randomToken = require('random-token');
 
 var Default = function(){
     this.response = function(action, req, res, next){
@@ -13,11 +13,8 @@ Default.prototype.home = function(req, res, next){
 
 Default.prototype.go_room = function(req, res, next){
 
-    var min = 10000000;
-    var max = 90000000;
-
     //generate token room
-    var token = Math.floor(Math.random() * (max - min + 1)) + min;
+    var token = randomToken(30);
     res.redirect('/room/' + token);
 }
 
