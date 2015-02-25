@@ -1,5 +1,6 @@
-var randomToken = require('random-token');
-var _ = require('lodash');
+var randomToken = require('random-token'),
+    DefaultModel = require('../models/defaultModel'),
+    _ = require('lodash');
 
 var Default = function(){
     this.response = function(action, req, res, next, io){
@@ -19,6 +20,9 @@ Default.prototype.go_room = function(req, res, next, io){
     req.session.roomId = null;
 
     console.info("go room entrance");
+    this.model.save(data, function(doc){
+
+    });
 
     //generate token room
     var token = randomToken(30);
