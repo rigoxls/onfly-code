@@ -3,31 +3,52 @@ var randomToken = require('random-token'),
     _ = require('lodash');
 
 var Default = function(){
+
+    this.model = new DefaultModel();
+
     this.response = function(action, req, res, next, io){
         this[action](req, res, next, io);
     }
 };
 
 Default.prototype.home = function(req, res, next, io){
-    var object = {init: 'show message init'};
+
+    var roomId = req.params.id || 0;
+
+    var object = {roomId: roomId};
     res.render('home', object);
 };
 
 Default.prototype.go_room = function(req, res, next, io){
 
+    var self = this;
+
     req.session.userName = req.body.username || {};
     req.session.userEmail = req.body.email || {};
     req.session.roomId = null;
 
-    console.info("go room entrance");
-    this.model.save(data, function(doc){
+    var data = { roomId : req.body.roomId };
 
+    this.model.findByRoomId(data, function(doc){
+
+        if(!_.isEmpty(doc)){
+            res.redirect('/room/' + req.body.roomId);
+        }else{
+            //if empty that means it is a new session
+            var token = randomToken(30);
+            var dataRoom = { roomId : token };
+            self.saveRoom(dataRoom);
+            res.redirect('/room/' + token);
+        }
     });
+};
 
-    //generate token room
-    var token = randomToken(30);
-    res.redirect('/room/' + token);
-}
+Default.prototype.saveRoom = function(data){
+    //save current roomId
+    this.model.saveRoom(data, function(doc){
+        console.info("object was saved");
+    });
+};
 
 Default.prototype.room = function(req, res, next, io){
 
@@ -49,8 +70,6 @@ Default.prototype.room = function(req, res, next, io){
     }
     //assign session->roomId and show room
     else{
-        console.info(req.session.userName);
-        console.info(req.session.userEmail);
         req.session.roomId = roomId;
         var object = {roomId: roomId};
         res.render('room', object);
