@@ -16,6 +16,22 @@ var SocketIO = function(config){
         //create a room
         socket.on('create', function(roomId){
             socket.join(roomId);
+
+            var data = { roomId : roomId };
+
+            self.model.findByRoomId(data, function(doc){
+                //without broadcast cause we need update our own document if refresh or
+                //we are opening an old document
+
+                //It broadcasts the data to all
+                //the socket clients which are connected to the room even our room
+                // socket.broadcast.to only send data to all clientes except socket sender
+                io.sockets.in(data.roomId).emit('set_session',
+                {
+                    content: doc[0].content
+                });
+            });
+
         });
 
         //on any change on editor we broadcast to all users
@@ -23,6 +39,16 @@ var SocketIO = function(config){
             if(!_.isEmpty(data)){
                 if(!_.isEmpty(data.roomId)){
                     roomsArray[data.roomId] = { roomId: data.roomId, content: data.newText };
+
+                    var dataRoom = {
+                        roomId: roomsArray[data.roomId].roomId,
+                        content: roomsArray[data.roomId].content
+                    };
+
+                    //save editor document
+                    self.model.saveRoom(dataRoom, 'update', function(doc){
+                        console.info("object was updated");
+                    });
                 }
 
                 socket.broadcast.to(data.roomId).emit('editor_broadcast',
@@ -31,32 +57,6 @@ var SocketIO = function(config){
                 });
             }else{
                 console.error("Error emiting event from room is sending an empty value, editor_change");
-            }
-        });
-
-        //save editor document
-        socket.on('save_document', function(data){
-            if(!_.isEmpty(data)){
-                if(!_.isUndefined(data.roomId)){
-                    if(!_.isUndefined(roomsArray[data.roomId])){
-
-                        var dataRoom = {
-                            roomId: roomsArray[data.roomId].roomId,
-                            content: roomsArray[data.roomId].content
-                        };
-                        //save current roomId
-                        self.model.saveRoom(dataRoom, 'update', function(doc){
-                            console.info("object was updated");
-                        });
-
-                    }else{
-                        console.error("Error, roomId doesn't exist !!");
-                    }
-                }
-
-
-            }else{
-                console.error("Error emiting event from room is sending an empty value, save_document");
             }
         });
 

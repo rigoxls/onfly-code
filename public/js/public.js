@@ -12,7 +12,8 @@
     //create a connection with socket, by default io variable is sponsor by socket lib
     var socket = io.connect('http://localhost:3000');
 
-    //join room, roomId gotten from template
+    //join room and update content,
+    //roomId gotten from template
     socket.emit('create', roomId);
 
     socket.on('editor_broadcast', function(data){
@@ -31,6 +32,13 @@
 
     });
 
+    //set document, stored data
+    socket.on('set_session', function(data){
+        console.info("data ata");
+        console.info(data);
+        editor.setValue(data.content, 1);
+    });
+
     editor.getSession().on('change', function(e) {
         if (editor.curOp && editor.curOp.command.name || !editor.silence){
                 console.info('editor change sent');
@@ -42,14 +50,6 @@
                     });
         }
     });
-
-    //autosave after 1 mins
-    setInterval(function(){
-        socket.emit('save_document',
-            {
-                roomId: roomId
-            });
-    },60000);
 
 })(window)
 
