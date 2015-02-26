@@ -32,6 +32,8 @@ Default.prototype.go_room = function(req, res, next, io){
     this.model.findByRoomId(data, function(doc){
 
         if(!_.isEmpty(doc)){
+            console.info("documentttt");
+            console.info(doc);
             res.redirect('/room/' + req.body.roomId);
         }else{
             //if empty that means it is a new session
@@ -45,7 +47,7 @@ Default.prototype.go_room = function(req, res, next, io){
 
 Default.prototype.saveRoom = function(data){
     //save current roomId
-    this.model.saveRoom(data, function(doc){
+    this.model.saveRoom(data, 'insert', function(doc){
         console.info("object was saved");
     });
 };

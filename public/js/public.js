@@ -43,6 +43,14 @@
         }
     });
 
+    //autosave after 1 mins
+    setInterval(function(){
+        socket.emit('save_document',
+            {
+                roomId: roomId
+            });
+    },60000);
+
 })(window)
 
 
