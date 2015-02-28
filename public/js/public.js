@@ -1,7 +1,8 @@
 (function(win){
 
     var editor = ace.edit("editor");
-    var Range = ace.require("ace/range").Range
+    var Range = ace.require("ace/range").Range;
+    var sessionSetted = false;
 
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/javascript");
@@ -34,13 +35,15 @@
 
     //set document, stored data
     socket.on('set_session', function(data){
-        console.info("data ata");
-        console.info(data);
-        editor.setValue(data.content, 1);
+        if(sessionSetted === false){
+            editor.setValue(data.content, 1);
+            sessionSetted = true;
+        }
     });
 
     editor.getSession().on('change', function(e) {
-        if (editor.curOp && editor.curOp.command.name || !editor.silence){
+        if(sessionSetted){
+            if (editor.curOp && editor.curOp.command.name || !editor.silence){
                 console.info('editor change sent');
                 console.info(e);
                 socket.emit('editor_change',
@@ -48,6 +51,7 @@
                       newText: editor.getValue(),
                       roomId: roomId
                     });
+            }
         }
     });
 
