@@ -23,12 +23,12 @@
 </div>
 <div id="chat-message">
 
-    <div id="chat-text">
+    <div>
         <input type="text" id="text-area">
     </div>
 
-    <div id="chat-text" >
-    <button id="send" > Enviar</button>
+    <div >
+        <button id="send" > Enviar</button>
     </div>
 
 </div>
@@ -37,7 +37,16 @@
     var roomId = '{{roomId}}';
 </script>
 
+<script src="/js/handlebars-v3.0.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/ace-editor/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="/js/public.js" type="text/javascript" charset="utf-8"></script>
+
+<script id="tpl-chat-message" type="text/x-handlebars-template">
+    <li class="left line">
+        <img src="http://findicons.com/files/icons/1072/face_avatars/300/a02.png" width="30">
+        <strong>{{userName}} :</strong>
+        {{message}}
+    </li>
+</script>
 
 {% endblock %}

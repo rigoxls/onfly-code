@@ -23,8 +23,9 @@
 
         OFC = function(config){
 
+            var self = this;
+
             this.init = function(config){
-                var self = this;
                 self.params = config;
                 self.initEditor();
                 self.initSocketEvents();
@@ -87,13 +88,20 @@
             this.initJqueryEvents = function(){
                 $('#text-area').keyup(function(e){
                     if(e.keyCode === 13){
-                        this.sendMessage();
+                        self.sendMessage(this);
                     }
                 });
             };
 
-            this.sendMessage = function(){
-                console.info("estoy enviando un mensaje");
+            this.sendMessage = function(el){
+                var source = $('#tpl-chat-message').html();
+                var template = Handlebars.compile(source);
+
+                var context = { userName: 'rigo', message: $(el).val() };
+                var html = template(context);
+
+                $('#chat-box .chat-list').append(html);
+
             };
 
             this.init(config);

@@ -27,6 +27,7 @@ var env = process.env.NODE_EV || 'production',
         //tell express we are going to use swing
         this.expressServer.engine('html', swig.renderFile);
         this.expressServer.set('view engine', 'html');
+        swig.setDefaults({ varControls: ['[[' , ']]'] });
 
         //where templates are located
         this.expressServer.set('views', __dirname + '/../app/default/views/templates');
@@ -35,7 +36,7 @@ var env = process.env.NODE_EV || 'production',
         if(env == 'development'){
             console.info('this is development environment');
             this.expressServer.set('view cache', false);
-            swig.setDefaults({cache: false});
+            swig.setDefaults({cache: false, varControls: ['[[' , ']]']});
         }
 };
 
