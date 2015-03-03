@@ -39,25 +39,62 @@ Default.prototype.go_room = function(req, res, next, io){
     }
 
     var data = { roomId : req.body.roomId };
+    var dataRoom = {
+                       userName: req.session.userName,
+                       userEmail: req.session.userEmail,
+                       userAvatar: self.setUserAvatar()
+                   };
 
     this.model.findByRoomId(data, function(doc){
 
         if(!_.isEmpty(doc)){
-            res.redirect('/room/' + req.body.roomId);
+            dataRoom.roomId = req.body.roomId;
+            //check if user is registered already in room
+            self.findUserInRoom( dataRoom, res );
+
         }else{
             //if empty that means it is a new session
             var token = randomToken(30);
-            var dataRoom = {
-                               roomId : token,
-                               userName: req.session.userName,
-                               userEmail: req.session.userEmail,
-                               userAvatar: self.setUserAvatar()
-                           };
+            dataRoom.roomId = token;
 
             //save room local method
-            self.saveRoom(dataRoom);
+            self.saveRoom( dataRoom );
             res.redirect('/room/' + token);
         }
+    });
+};
+
+//check if user already was saved in room
+//if not save it, else just redirect it
+Default.prototype.findUserInRoom = function(data, res){
+
+    var self = this;
+
+    this.model.findUserInRoom(data, function(doc){
+
+        if(!_.isEmpty(doc[0].users)){
+            //redirect user
+            res.redirect('/room/' + data.roomId);
+        }else{
+            //insert new user
+            var dataRoom = {
+                roomId: data.roomId,
+                $push: {
+                        'users': {
+                            username: data.userName,
+                            email: data.userEmail,
+                            avatar: data.userAvatar
+                       }
+                }
+            };
+
+            //update room with new user info
+            self.model.saveRoom(dataRoom, 'update', function(doc){
+                console.info("user inserted in room");
+                res.redirect('/room/' + data.roomId);
+            });
+        }
+
     });
 };
 

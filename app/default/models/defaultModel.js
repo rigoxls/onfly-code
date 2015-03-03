@@ -13,6 +13,27 @@ DefaultModel.prototype.findByRoomId = function(data, callback){
     });
 };
 
+DefaultModel.prototype.findUserInRoom = function(data, callback){
+
+    this.model.find( {
+                        roomId: data.roomId
+                     },
+                     {
+                        users:
+                        {
+                            $elemMatch:
+                                {
+                                    'email': data.userEmail
+                                }
+                            }
+                        },
+                        function(err, doc){
+                            callback(doc);
+                        }
+                    );
+
+};
+
 DefaultModel.prototype.saveRoom = function(data, method, callback){
 
     if(method === 'insert'){
