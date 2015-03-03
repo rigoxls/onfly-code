@@ -4,8 +4,16 @@ var mongoose = require('mongoose'),
 var defaultSchema = new Schema({
     roomId: { type: String, require: true },
     content: String,
-    comments: [ { body: String, date: { type: Date, default: Date.now } } ],
-    emails: [ { type: String, index: { unique: true } } ]
+    comments: [ {
+                    username: String,
+                    body: String,
+                    date: { type: Date, default: Date.now }
+              } ],
+    users: [ {
+                username: String,
+                avatar: String,
+                email: String
+           } ]
 });
 
 var DefaultSchema = mongoose.model('Default', defaultSchema);

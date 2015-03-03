@@ -1,12 +1,12 @@
 (function(window){
 
-    var OFlyCode = (function(win){
+    var OFlyCode = (function(window){
         var OFlyCode = {
             CONSTANTS : {
-                editor: win.ace.edit("editor"),
-                range:  win.ace.require("ace/range").Range,
+                editor: window.ace.edit("editor"),
+                range:  window.ace.require("ace/range").Range,
                 sessionSetted: false,
-                roomId: win.roomId
+                roomId: window.roomId
             }
         };
         return OFlyCode;

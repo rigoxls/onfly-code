@@ -27,6 +27,17 @@ Default.prototype.go_room = function(req, res, next, io){
     req.session.userEmail = req.body.email || {};
     req.session.roomId = null;
 
+    //if bad data were sent, unless userName and userEmail are needed
+    if( !_.isString( req.session.userName ) && !_.isString(req.session.userEmail) ){
+        res.redirect('/home/');
+    }else{
+        //if not email redirects to home
+        var testEmail = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if(!testEmail.test(req.session.userEmail)){
+            res.redirect('/home/');
+        }
+    }
+
     var data = { roomId : req.body.roomId };
 
     this.model.findByRoomId(data, function(doc){
@@ -36,7 +47,14 @@ Default.prototype.go_room = function(req, res, next, io){
         }else{
             //if empty that means it is a new session
             var token = randomToken(30);
-            var dataRoom = { roomId : token };
+            var dataRoom = {
+                               roomId : token,
+                               userName: req.session.userName,
+                               userEmail: req.session.userEmail,
+                               userAvatar: self.setUserAvatar()
+                           };
+
+            //save room local method
             self.saveRoom(dataRoom);
             res.redirect('/room/' + token);
         }
@@ -74,16 +92,10 @@ Default.prototype.room = function(req, res, next, io){
         var object = {roomId: roomId};
         res.render('room', object);
     }
+};
 
-//toi check with sockets
-/*    Io.sockets.on('connection', function(socket){
-        socket.on('editor_change', function(data){
-            socket.broadcast.emit('editor_broadcast',
-                {
-                    newText: '45454646546546546465464',
-                });
-        });
-    });*/
+Default.prototype.setUserAvatar = function(){
+    return '/icons/' + parseInt(Math.random() * (28 - 1) + 1) + '.png';
 };
 
 module.exports = Default;

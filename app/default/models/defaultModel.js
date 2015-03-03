@@ -16,7 +16,16 @@ DefaultModel.prototype.findByRoomId = function(data, callback){
 DefaultModel.prototype.saveRoom = function(data, method, callback){
 
     if(method === 'insert'){
-        var data = { roomId: data.roomId, content: '' };
+        var data = {
+                        roomId: data.roomId,
+                        content: '',
+                        users: [{
+                            username: data.userName,
+                            email: data.userEmail,
+                            avatar: data.userAvatar
+                        }]
+                   };
+
         var cM = new modelDefault(data);
 
         cM.save(function(err, data){
