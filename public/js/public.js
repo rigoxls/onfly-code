@@ -5,8 +5,7 @@
             CONSTANTS : {
                 editor: window.ace.edit("editor"),
                 range:  window.ace.require("ace/range").Range,
-                sessionSetted: false,
-                roomId: window.roomId
+                sessionSetted: false
             }
         };
         return OFlyCode;
@@ -24,9 +23,11 @@
         OFC = function(config){
 
             var self = this;
+            this.roomId = config.roomId;
+            this.userAvatar = config.userAvatar;
+            this.userName = config.userName;
 
-            this.init = function(config){
-                self.params = config;
+            this.init = function(){
                 self.initEditor();
                 self.initSocketEvents();
                 self.initJqueryEvents();
@@ -40,9 +41,10 @@
             };
 
             this.initSocketEvents = function(){
+                var self = this;
                 //join room and update content,
                 //roomId gotten from template
-                socket.emit('create', OFlyCode.CONSTANTS.roomId);
+                socket.emit('create', self.roomId);
 
                 socket.on('editor_broadcast', function(data){
 
@@ -58,6 +60,18 @@
 
                     editor.silence = false;
 
+                });
+
+                //get message sent by other users
+                socket.on('message_broadcast', function(data){
+                    var source = $('#tpl-chat-message').html();
+                    var template = Handlebars.compile(source);
+
+                    var context = data;
+                    context.bubblePosition = 'right';
+                    var html = template(context);
+
+                    $('#chat-box .chat-list').append(html);
                 });
 
                 //set document, stored data
@@ -76,7 +90,7 @@
                             socket.emit('editor_change',
                                 {
                                   newText: editor.getValue(),
-                                  roomId: roomId
+                                  roomId: self.roomId
                                 });
                         }
                     }
@@ -89,22 +103,28 @@
                 $('#text-area').keyup(function(e){
                     if(e.keyCode === 13){
                         self.sendMessage(this);
+                        $(this).val('');
                     }
                 });
             };
 
             this.sendMessage = function(el){
+                var self = this;
                 var source = $('#tpl-chat-message').html();
                 var template = Handlebars.compile(source);
 
-                var context = { userName: 'rigo', message: $(el).val() };
+                var context = { roomId: self.roomId, userName: self.userName, userAvatar: self.userAvatar, message: $(el).val() };
+                context.bubblePosition = 'left';
                 var html = template(context);
 
                 $('#chat-box .chat-list').append(html);
 
+                //emit message to all users
+                socket.emit('message_send', context);
+
             };
 
-            this.init(config);
+            this.init();
             return this;
         }; //end OFC
 
@@ -116,8 +136,8 @@
 
 })(window);
 
-
-var onflyCode = new OFlyCode.OFC({});
+var params = { userName : userName, userAvatar : userAvatar, roomId: roomId};
+new OFlyCode.OFC(params);
 
 
 

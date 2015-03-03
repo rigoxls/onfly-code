@@ -24,7 +24,7 @@ var SocketIO = function(config){
                 //we are opening an old document
 
                 //It broadcasts the data to all
-                //the socket clients which are connected to the room even our room
+                // sockets clients which are connected to the room even our room
                 // socket.broadcast.to only send data to all clientes except socket sender
                 io.sockets.in(data.roomId).emit('set_session',
                 {
@@ -58,6 +58,11 @@ var SocketIO = function(config){
             }else{
                 console.error("Error emiting event from room is sending an empty value, editor_change");
             }
+        });
+
+        //send message to all users
+        socket.on('message_send', function(data){
+            socket.broadcast.to(data.roomId).emit('message_broadcast', data);
         });
 
     });

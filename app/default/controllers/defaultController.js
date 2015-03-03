@@ -50,7 +50,7 @@ Default.prototype.go_room = function(req, res, next, io){
         if(!_.isEmpty(doc)){
             dataRoom.roomId = req.body.roomId;
             //check if user is registered already in room
-            self.findUserInRoom( dataRoom, res );
+            self.findUserInRoom( dataRoom, req, res );
 
         }else{
             //if empty that means it is a new session
@@ -66,13 +66,20 @@ Default.prototype.go_room = function(req, res, next, io){
 
 //check if user already was saved in room
 //if not save it, else just redirect it
-Default.prototype.findUserInRoom = function(data, res){
+Default.prototype.findUserInRoom = function(data, req, res){
 
     var self = this;
 
     this.model.findUserInRoom(data, function(doc){
 
+        //user already was in room
         if(!_.isEmpty(doc[0].users)){
+            //setting avatar
+            if(typeof(doc[0].users[0].avatar) !== 'undefined'){
+                req.session.userAvatar = doc[0].users[0].avatar;
+            }else{
+                req.session.userAvatar = '';
+            }
             //redirect user
             res.redirect('/room/' + data.roomId);
         }else{
@@ -87,6 +94,8 @@ Default.prototype.findUserInRoom = function(data, res){
                        }
                 }
             };
+
+            req.session.userAvatar = data.userAvatar;
 
             //update room with new user info
             self.model.saveRoom(dataRoom, 'update', function(doc){
@@ -126,7 +135,7 @@ Default.prototype.room = function(req, res, next, io){
     //assign session->roomId and show room
     else{
         req.session.roomId = roomId;
-        var object = {roomId: roomId};
+        var object = {roomId: roomId, userName: req.session.userName, userAvatar: req.session.userAvatar};
         res.render('room', object);
     }
 };

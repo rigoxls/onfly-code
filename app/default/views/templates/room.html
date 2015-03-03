@@ -23,7 +23,9 @@
 </div>
 
 <script type="text/javascript">
-    var roomId = '[[roomId]]';
+    var roomId = '[[ roomId ]]';
+    var userName = '[[ userName ]]';
+    var userAvatar = '[[ userAvatar ]]';
 </script>
 
 <script src="/js/handlebars-v3.0.0.js" type="text/javascript" charset="utf-8"></script>
@@ -31,8 +33,8 @@
 <script src="/js/public.js" type="text/javascript" charset="utf-8"></script>
 
 <script id="tpl-chat-message" type="text/x-handlebars-template">
-    <li class="left line">
-        <img src="{{ avatar }}" width="20">
+    <li class="{{ bubblePosition }} line">
+        <img src="{{ userAvatar }}" width="20">
         <strong>{{ userName }} :</strong>
         {{ message }}
     </li>
