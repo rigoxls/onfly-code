@@ -70,8 +70,10 @@
                     var context = data;
                     context.bubblePosition = 'right';
                     var html = template(context);
-
                     $('#chat-box .chat-list').append(html);
+
+                    //scrolltop
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
                 });
 
                 //set document, stored data
@@ -100,11 +102,19 @@
 
 
             this.initJqueryEvents = function(){
-                $('#text-area').keyup(function(e){
+
+                var textArea = $('#text-area');
+
+                textArea.keyup(function(e){
                     if(e.keyCode === 13){
                         self.sendMessage(this);
-                        $(this).val('');
+                        textArea.val('');
                     }
+                });
+
+                $('#send').click(function(){
+                    self.sendMessage(textArea);
+                    textArea.val('');
                 });
             };
 
@@ -112,6 +122,7 @@
                 var self = this;
                 var source = $('#tpl-chat-message').html();
                 var template = Handlebars.compile(source);
+                var textArea = $('#text-area');
 
                 var context = { roomId: self.roomId, userName: self.userName, userAvatar: self.userAvatar, message: $(el).val() };
                 context.bubblePosition = 'left';
@@ -119,9 +130,11 @@
 
                 $('#chat-box .chat-list').append(html);
 
+                //scroll top
+                $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+
                 //emit message to all users
                 socket.emit('message_send', context);
-
             };
 
             this.init();

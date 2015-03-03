@@ -141,7 +141,7 @@ Default.prototype.room = function(req, res, next, io){
 };
 
 Default.prototype.setUserAvatar = function(){
-    return '/icons/' + parseInt(Math.random() * (28 - 1) + 1) + '.png';
+    return '/icons/' + parseInt(Math.random() * (49 - 1) + 1) + '.png';
 };
 
 module.exports = Default;
