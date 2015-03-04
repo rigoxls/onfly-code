@@ -63,6 +63,22 @@ var SocketIO = function(config){
         //send message to all users
         socket.on('message_send', function(data){
             socket.broadcast.to(data.roomId).emit('message_broadcast', data);
+
+            var dataRoom = {
+                roomId: data.roomId,
+                $push: {
+                        'messages': {
+                            username: data.userName,
+                            message: data.message,
+                       }
+                }
+            };
+
+            //save message
+            self.model.saveRoom(dataRoom, 'update', function(doc){
+                console.info("message saved");
+            });
+
         });
 
     });

@@ -56,10 +56,12 @@ DefaultModel.prototype.saveRoom = function(data, method, callback){
         });
     }
     else if(method === 'update'){
+
         //this.model.findOneAndUpdate(query, update, options, function(err, doc)
         this.model.findOneAndUpdate({
             roomId: data.roomId
-        }, data, { upsert: false }).exec(function(err, doc){
+        },
+        data, { upsert: false }).exec(function(err, doc){
             callback();
         });
     }

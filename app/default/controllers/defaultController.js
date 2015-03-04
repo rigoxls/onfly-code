@@ -40,22 +40,25 @@ Default.prototype.go_room = function(req, res, next, io){
 
     var data = { roomId : req.body.roomId };
     var dataRoom = {
-                       userName: req.session.userName,
-                       userEmail: req.session.userEmail,
-                       userAvatar: self.setUserAvatar()
-                   };
+       userName: req.session.userName,
+       userEmail: req.session.userEmail,
+       userAvatar: self.setUserAvatar()
+    };
 
     this.model.findByRoomId(data, function(doc){
-
+        //room was created before
         if(!_.isEmpty(doc)){
-            dataRoom.roomId = req.body.roomId;
+            dataRoom.roomId = doc[0].roomId;
             //check if user is registered already in room
             self.findUserInRoom( dataRoom, req, res );
-
-        }else{
+        }
+        else{
             //if empty that means it is a new session
             var token = randomToken(30);
             dataRoom.roomId = token;
+
+            //set avatar
+            req.session.userAvatar = dataRoom.userAvatar;
 
             //save room local method
             self.saveRoom( dataRoom );
@@ -71,18 +74,20 @@ Default.prototype.findUserInRoom = function(data, req, res){
     var self = this;
 
     this.model.findUserInRoom(data, function(doc){
-
         //user already was in room
         if(!_.isEmpty(doc[0].users)){
+
             //setting avatar
             if(typeof(doc[0].users[0].avatar) !== 'undefined'){
                 req.session.userAvatar = doc[0].users[0].avatar;
-            }else{
+            }
+            else{
                 req.session.userAvatar = '';
             }
             //redirect user
             res.redirect('/room/' + data.roomId);
-        }else{
+        }
+        else{
             //insert new user
             var dataRoom = {
                 roomId: data.roomId,
@@ -136,6 +141,7 @@ Default.prototype.room = function(req, res, next, io){
     else{
         req.session.roomId = roomId;
         var object = {roomId: roomId, userName: req.session.userName, userAvatar: req.session.userAvatar};
+        console.info(object);
         res.render('room', object);
     }
 };
