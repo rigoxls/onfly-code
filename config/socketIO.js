@@ -21,7 +21,7 @@ var SocketIO = function(config){
             var data = { roomId : roomId };
 
             self.model.findByRoomId(data, function(doc){
-                self.restoreChat(roomId, doc[0]);
+                self.restoreChat(roomId, doc[0], socket);
                 //without broadcast cause we need update our own document if refresh or
                 //we are opening an old document
 
@@ -86,7 +86,7 @@ var SocketIO = function(config){
     }); //end socketio connection method
 
     // this should be in a service , dirty for the moment :(
-    this.restoreChat = function(roomId, doc){
+    this.restoreChat = function(roomId, doc, socket){
 
         var data = null,
             messages = doc.messages,
@@ -115,8 +115,8 @@ var SocketIO = function(config){
             }
         }
 
-        //emit event
-        io.sockets.in(roomId).emit('set_chat_messages', cleanData);
+        //emit event to socket emisor
+        socket.emit('set_chat_messages', cleanData);
     };
 
     return io;

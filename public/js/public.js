@@ -5,8 +5,7 @@
             CONSTANTS : {
                 editor: window.ace.edit("editor"),
                 range:  window.ace.require("ace/range").Range,
-                sessionSetted: false,
-                chatStarted: false
+                sessionSetted: false
             }
         };
         return OFlyCode;
@@ -18,7 +17,6 @@
         var OFC;
         var editor = OFlyCode.CONSTANTS.editor;
         var sessionSetted = OFlyCode.CONSTANTS.sessionSetted;
-        var chatStarted = OFlyCode.CONSTANTS.chatStarted;
 
         //create a connection with socket, by default io variable is sponsor by socket lib
         var socket = io.connect('http://localhost:3000');
@@ -103,15 +101,12 @@
 
                         context.bubblePosition = (self.userEmail === data[i].user.email) ? 'left' : 'right';
 
-                        if(!chatStarted){
-                            var html = template(context);
-                            $('#chat-box .chat-list').append(html);
-                        }                        
+                        var html = template(context);
+                        $('#chat-box .chat-list').append(html);
                     }
 
                     //scrolltop
                     $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
-                    chatStarted = true;
 
                 });
 
