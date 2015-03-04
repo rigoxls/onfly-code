@@ -1,11 +1,12 @@
 var Io = require('socket.io'),
     DefaultModel = require('../app/default/models/defaultModel'),
     _ = require('lodash'),
-    roomsArray = [];
+    roomsArray = [],
+    usersObject = {};
 
 var SocketIO = function(config){
-    config = config || {};
-    self = this;
+    var config = config || {};
+    var self = this;
     this.model = new DefaultModel();
 
     //this line makes possible listen socket io on browser, /socket.io/socket.io.js
@@ -20,13 +21,14 @@ var SocketIO = function(config){
             var data = { roomId : roomId };
 
             self.model.findByRoomId(data, function(doc){
+                self.restoreChat(roomId, doc[0]);
                 //without broadcast cause we need update our own document if refresh or
                 //we are opening an old document
 
                 //It broadcasts the data to all
                 // sockets clients which are connected to the room even our room
                 // socket.broadcast.to only send data to all clientes except socket sender
-                io.sockets.in(data.roomId).emit('set_session',
+                socket.emit('set_session',
                 {
                     content: doc[0].content
                 });
@@ -68,8 +70,8 @@ var SocketIO = function(config){
                 roomId: data.roomId,
                 $push: {
                         'messages': {
-                            username: data.userName,
-                            message: data.message,
+                            userEmail: data.userEmail,
+                            message: data.message
                        }
                 }
             };
@@ -81,7 +83,41 @@ var SocketIO = function(config){
 
         });
 
-    });
+    }); //end socketio connection method
+
+    // this should be in a service , dirty for the moment :(
+    this.restoreChat = function(roomId, doc){
+
+        var data = null,
+            messages = doc.messages,
+            users = doc.users;
+            cleanData = [];
+
+        //load users
+        for(var i in users){
+            if(typeof usersObject[users[i].email] === 'undefined'){
+                usersObject[users[i].email] = users[i];
+            }
+        }
+
+        //link users with messages
+        for(var k in messages){
+            if(typeof messages[k].userEmail !== 'undefined'){
+                if(typeof usersObject[messages[k].userEmail] !== 'undefined'){
+                    cleanData[k] = {
+                        message: {
+                            content: messages[k].message,
+                            date: messages[k].date
+                        },
+                        user: usersObject[messages[k].userEmail]
+                    };
+                }
+            }
+        }
+
+        //emit event
+        io.sockets.in(roomId).emit('set_chat_messages', cleanData);
+    };
 
     return io;
 }

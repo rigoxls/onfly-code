@@ -90,7 +90,6 @@
 
                 socket.on('set_chat_messages', function(data){
 
-                    var messages
                     var source = $('#tpl-chat-message').html();
                     var template = Handlebars.compile(source);
                     var context = null;
