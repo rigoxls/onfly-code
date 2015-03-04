@@ -93,7 +93,7 @@ Default.prototype.findUserInRoom = function(data, req, res){
                 roomId: data.roomId,
                 $push: {
                         'users': {
-                            username: data.userName,
+                            name: data.userName,
                             email: data.userEmail,
                             avatar: data.userAvatar
                        }
@@ -140,8 +140,12 @@ Default.prototype.room = function(req, res, next, io){
     //assign session->roomId and show room
     else{
         req.session.roomId = roomId;
-        var object = {roomId: roomId, userName: req.session.userName, userAvatar: req.session.userAvatar};
-        console.info(object);
+        var object = {
+            roomId: roomId,
+            userName: req.session.userName,
+            userAvatar: req.session.userAvatar,
+            userEmail: req.session.userEmail
+        };
         res.render('room', object);
     }
 };

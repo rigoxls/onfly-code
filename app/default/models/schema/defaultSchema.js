@@ -5,12 +5,12 @@ var defaultSchema = new Schema({
     roomId: { type: String, require: true },
     content: String,
     messages: [ {
-                    username: String,
+                    userEmail: String,
                     message: String,
                     date: { type: Date, default: Date.now }
               } ],
     users: [ {
-                username: String,
+                name: String,
                 avatar: String,
                 email: String
            } ]

@@ -5,7 +5,8 @@
             CONSTANTS : {
                 editor: window.ace.edit("editor"),
                 range:  window.ace.require("ace/range").Range,
-                sessionSetted: false
+                sessionSetted: false,
+                chatStarted: false
             }
         };
         return OFlyCode;
@@ -17,6 +18,8 @@
         var OFC;
         var editor = OFlyCode.CONSTANTS.editor;
         var sessionSetted = OFlyCode.CONSTANTS.sessionSetted;
+        var chatStarted = OFlyCode.CONSTANTS.chatStarted;
+
         //create a connection with socket, by default io variable is sponsor by socket lib
         var socket = io.connect('http://localhost:3000');
 
@@ -26,6 +29,7 @@
             this.roomId = config.roomId;
             this.userAvatar = config.userAvatar;
             this.userName = config.userName;
+            this.userEmail = config.userEmail;
 
             this.init = function(){
                 self.initEditor();
@@ -84,6 +88,34 @@
                     }
                 });
 
+                socket.on('set_chat_messages', function(data){
+
+                    var messages
+                    var source = $('#tpl-chat-message').html();
+                    var template = Handlebars.compile(source);
+                    var context = null;
+
+                    for(var i in data){
+                        context = {
+                           userName: data[i].user.name,
+                           userAvatar: data[i].user.avatar,
+                           message: data[i].message.content
+                        };
+
+                        context.bubblePosition = (self.userEmail === data[i].user.email) ? 'left' : 'right';
+
+                        if(!chatStarted){
+                            var html = template(context);
+                            $('#chat-box .chat-list').append(html);
+                        }                        
+                    }
+
+                    //scrolltop
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                    chatStarted = true;
+
+                });
+
                 editor.getSession().on('change', function(e) {
                     if(sessionSetted){
                         if (editor.curOp && editor.curOp.command.name || !editor.silence){
@@ -124,7 +156,14 @@
                 var template = Handlebars.compile(source);
                 var textArea = $('#text-area');
 
-                var context = { roomId: self.roomId, userName: self.userName, userAvatar: self.userAvatar, message: $(el).val() };
+                var context = {
+                    roomId: self.roomId,
+                    userName: self.userName,
+                    userEmail: self.userEmail,
+                    userAvatar: self.userAvatar,
+                    message: $(el).val()
+                };
+
                 context.bubblePosition = 'left';
                 var html = template(context);
 
@@ -149,7 +188,7 @@
 
 })(window);
 
-var params = { userName : userName, userAvatar : userAvatar, roomId: roomId};
+var params = { userName : userName, userEmail: userEmail, userAvatar : userAvatar, roomId: roomId};
 new OFlyCode.OFC(params);
 
 
