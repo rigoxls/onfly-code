@@ -66,12 +66,13 @@ li.line{
 
 li.right{
     margin-left:35px;
-    background-color: #2f2f5f;
+    background-color: #0667A4;
+    
 }
 
 li.left{
     margin-right:35px;
-    background-color: #0667A4;
+    background-color: #2f2f5f;
 }
 
 li img{

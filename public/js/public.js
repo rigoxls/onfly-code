@@ -70,7 +70,7 @@
                     var template = Handlebars.compile(source);
 
                     var context = data;
-                    context.bubblePosition = 'right';
+                    context.bubblePosition = 'left';
                     var html = template(context);
                     $('#chat-box .chat-list').append(html);
 
@@ -99,7 +99,7 @@
                            message: data[i].message.content
                         };
 
-                        context.bubblePosition = (self.userEmail === data[i].user.email) ? 'left' : 'right';
+                        context.bubblePosition = (self.userEmail === data[i].user.email) ? 'right' : 'left';
 
                         var html = template(context);
                         $('#chat-box .chat-list').append(html);
@@ -158,7 +158,7 @@
                     message: $(el).val()
                 };
 
-                context.bubblePosition = 'left';
+                context.bubblePosition = 'right';
                 var html = template(context);
 
                 $('#chat-box .chat-list').append(html);
