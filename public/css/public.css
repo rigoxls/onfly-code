@@ -9,6 +9,7 @@ body{
     bottom: 0;
     left: 0;
     width: 80%;
+    background-color: #272822;
 }
 
 #chat-box{
@@ -67,7 +68,7 @@ li.line{
 li.right{
     margin-left:35px;
     background-color: #0667A4;
-    
+
 }
 
 li.left{

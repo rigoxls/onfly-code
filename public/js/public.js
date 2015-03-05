@@ -81,7 +81,9 @@
                 //set document, stored data
                 socket.on('set_session', function(data){
                     if(sessionSetted === false){
-                        editor.setValue(data.content, 1);
+                        if(data.content.length > 0){
+                            editor.setValue(data.content, 1);
+                        }
                         sessionSetted = true;
                     }
                 });

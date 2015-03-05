@@ -42,7 +42,7 @@ DefaultModel.prototype.saveRoom = function(data, method, callback){
             roomId: data.roomId,
             content: '',
             users: [{
-                username: data.userName,
+                name: data.userName,
                 email: data.userEmail,
                 avatar: data.userAvatar
             }]
