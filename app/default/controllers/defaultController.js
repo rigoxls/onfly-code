@@ -14,8 +14,9 @@ var Default = function(){
 Default.prototype.home = function(req, res, next, io){
 
     var roomId = req.params.id || 0;
+    var errorMessage = (roomId == 'invalid_session') ? 'You have another session started !!' : '';
 
-    var object = {roomId: roomId};
+    var object = {roomId: roomId, errorMessage: errorMessage};
     res.render('home', object);
 };
 
@@ -45,6 +46,8 @@ Default.prototype.go_room = function(req, res, next, io){
        userAvatar: self.setUserAvatar()
     };
 
+    //search room by id
+    //note users cannot create default rooms, ex: /home/my_default_room
     this.model.findByRoomId(data, function(doc){
         //room was created before
         if(!_.isEmpty(doc)){
@@ -125,17 +128,19 @@ Default.prototype.room = function(req, res, next, io){
 
     //if no room id, go directly to login
     if(_.isUndefined(roomId)){
+        req.session.destroy();
         res.redirect('/home/');
     }
 
     //if credentials are empty redirect to login zone
     if(_.isEmpty(req.session.userName) || _.isEmpty(req.session.userEmail)){
+        req.session.destroy();
         res.redirect('/home/' + roomId);
     }
     //user is trying to create another session that current one
     else if(req.session.roomId !== null && req.session.roomId !== roomId){
         req.session.destroy();
-        res.redirect('/home/');
+        res.redirect('/home/invalid_session');
     }
     //assign session->roomId and show room
     else{

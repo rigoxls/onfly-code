@@ -1,5 +1,36 @@
-body{
-    background-color: #111;
+body {
+    background-color: #d9dee2;
+    font-family: 'Ubuntu', sans-serif;
+    color: #444;
+}
+
+#login{
+    height: 310px;
+    width: 400px;
+    margin: -150px 0 0 -230px;
+    padding: 30px;
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 7px 9px 70px;
+}
+
+input:not(#text-area){
+    padding: 15px 15px 15px 15px;
+    margin: 0 0 10px 0;
+    width: 353px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type=submit]{
+    font-size: 25px;
+}
+
+fieldset{
+    border : none;
 }
 
 #editor {
@@ -79,4 +110,8 @@ li.left{
 li img{
     float: left;
     margin-right: 6px;
+}
+
+h3.error{
+    color: #890014 !important;
 }

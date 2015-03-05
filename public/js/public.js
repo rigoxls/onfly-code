@@ -90,7 +90,7 @@
 
                 //if invalid session redirects
                 socket.on('invalid_session', function(){
-                    window.location.href = '/home/';
+                    window.location.href = '/home/invalid_session';
                 });
 
                 socket.on('set_chat_messages', function(data){

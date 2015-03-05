@@ -1,52 +1,10 @@
-<html>
-<head>
-    <title>OnFly Code, create a room an share your code with your partners ...</title>
-    <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
-    <script href="/js/jquery-1.11.2.min.js" type="text/javascript"></script>
+{% extends 'layout.html' %}
 
-    <style type="text/css">
-        body {
-            background-color: #d9dee2;
-            font-family: 'Ubuntu', sans-serif;
-            color: #444;
-        }
-
-        #login{
-            height: 310px;
-            width: 400px;
-            margin: -150px 0 0 -230px;
-            padding: 30px;
-            position: absolute;
-            top: 35%;
-            left: 50%;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 7px 9px 70px;
-        }
-
-        input{
-            padding: 15px 15px 15px 15px;
-            margin: 0 0 10px 0;
-            width: 353px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        input[type=submit]{
-            font-size: 25px;
-        }
-
-        fieldset{
-            border : none;
-        }
-    </style>
-
-</head>
-
-<body>
+{% block content %}
 
 <form id="login" method="post" action="/go_room/">
     <h1>Create Room</h1>
+    <h3 class="error"> [[ errorMessage ]]</h2>
     <fieldset id="inputs">
         <input id="userName" name="username" type="text" placeholder="Nickname" autofocus="" required="">
         <input id="email" name="email" type="email" placeholder="Email" required="">
@@ -56,3 +14,5 @@
         <input type="submit" id="submit" value="Get in !!">
     </fieldset>
 </form>
+
+{% endblock %}
