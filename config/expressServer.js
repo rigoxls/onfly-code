@@ -1,4 +1,4 @@
-var env = process.env.NODE_EV || 'production',
+var env = process.env.NODE_ENV || 'production',
     express = require('express'),
     swig = require('swig'),
     bodyParser = require('body-parser'),
@@ -37,6 +37,9 @@ var env = process.env.NODE_EV || 'production',
             console.info('this is development environment');
             this.expressServer.set('view cache', false);
             swig.setDefaults({cache: false, varControls: ['[[' , ']]']});
+        }else{
+            console.info(env);
+            console.info('mienda');
         }
 };
 

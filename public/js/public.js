@@ -46,7 +46,7 @@
                 var self = this;
                 //join room and update content,
                 //roomId gotten from template
-                socket.emit('create', self.roomId);
+                socket.emit('create', self.roomId, self.userEmail);
 
                 socket.on('editor_broadcast', function(data){
 
@@ -86,6 +86,11 @@
                         }
                         sessionSetted = true;
                     }
+                });
+
+                //if invalid session redirects
+                socket.on('invalid_session', function(){
+                    window.location.href = '/home/';
                 });
 
                 socket.on('set_chat_messages', function(data){

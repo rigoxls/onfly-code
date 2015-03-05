@@ -1,8 +1,7 @@
 var Io = require('socket.io'),
     DefaultModel = require('../app/default/models/defaultModel'),
     _ = require('lodash'),
-    roomsArray = [],
-    usersObject = {};
+    usersConnected = [];
 
 var SocketIO = function(config){
     var config = config || {};
@@ -14,24 +13,39 @@ var SocketIO = function(config){
 
     io.sockets.on('connection', function(socket){
 
-        //create a room
-        socket.on('create', function(roomId){
+        socket.on('disconnect', function(){
+            //remove user from users connected
+            delete usersConnected[socket.uKey];
+        });
+
+        //create a room if it does not exists
+        socket.on('create', function(roomId, userEmail){
             socket.join(roomId);
 
             var data = { roomId : roomId };
 
             self.model.findByRoomId(data, function(doc){
                 self.restoreChat(roomId, doc[0], socket);
-                //without broadcast cause we need update our own document if refresh or
-                //we are opening an old document
 
-                //It broadcasts the data to all
-                // sockets clients which are connected to the room even our room
-                // socket.broadcast.to only send data to all clientes except socket sender
-                socket.emit('set_session',
-                {
-                    content: doc[0].content
-                });
+
+                var uKey = roomId + userEmail;
+                socket.uKey = uKey;
+
+                if(typeof usersConnected[uKey] == 'undefined'){
+                    //emit to current socket
+                    socket.emit('set_session',
+                    {
+                        content: doc[0].content
+                    });
+
+                    //add user to usersConnected to avoid user twice in same room
+                    usersConnected[uKey] = userEmail;
+                }
+                else{
+                    //users is trying to sign in twice in same room
+                    socket.emit('invalid_session');
+                }
+
             });
 
         });
@@ -40,16 +54,15 @@ var SocketIO = function(config){
         socket.on('editor_change', function(data){
             if(!_.isEmpty(data)){
                 if(!_.isEmpty(data.roomId)){
-                    roomsArray[data.roomId] = { roomId: data.roomId, content: data.newText };
 
                     var dataRoom = {
-                        roomId: roomsArray[data.roomId].roomId,
-                        content: roomsArray[data.roomId].content
+                        roomId: data.roomId,
+                        content: data.newText
                     };
 
                     //save editor document
                     self.model.saveRoom(dataRoom, 'update', function(doc){
-                        console.info("object was updated");
+                        console.info("document was updated, need to improve");
                     });
                 }
 
@@ -93,23 +106,23 @@ var SocketIO = function(config){
             users = doc.users;
             cleanData = [];
 
-        //load users
+        //search users into doc, and create a simple array with them
         for(var i in users){
-            if(typeof usersObject[users[i].email] === 'undefined'){
-                usersObject[users[i].email] = users[i];
+            if(typeof socket[users[i].email] === 'undefined'){
+                socket[users[i].email] = users[i];
             }
         }
 
         //link users with messages
         for(var k in messages){
             if(typeof messages[k].userEmail !== 'undefined'){
-                if(typeof usersObject[messages[k].userEmail] !== 'undefined'){
+                if(typeof socket[messages[k].userEmail] !== 'undefined'){
                     cleanData[k] = {
                         message: {
                             content: messages[k].message,
                             date: messages[k].date
                         },
-                        user: usersObject[messages[k].userEmail]
+                        user: socket[messages[k].userEmail]
                     };
                 }
             }
