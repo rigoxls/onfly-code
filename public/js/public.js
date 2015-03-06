@@ -92,7 +92,10 @@
                     if(sessionSetted === false){
                         if(data.content.length > 0){
                             editor.setValue(data.content, 1);
+
+                            //setting mode
                             editor.session.setMode("ace/mode/" + data.mode);
+                            $('#l-mode').val(data.mode);
                         }
                         sessionSetted = true;
                     }
@@ -124,22 +127,10 @@
 
                 //when editor change, fire an emit to info all users something has changed
                 editor.getSession().on('change', function(e) {
-                    var marker = {};
-                    var mode = $('#l-mode').val();
-
                     if(sessionSetted){
                         if (editor.curOp && editor.curOp.command.name || !editor.silence){
-
-                            marker = editor.getCursorPosition();
-                            marker.key = self.userEmail;
-
-                            socket.emit('editor_change',
-                                {
-                                  roomId: self.roomId,
-                                  newText: editor.getValue(),
-                                  marker: marker,
-                                  mode: mode
-                                });
+                            //save document
+                            self.saveDocument();
                         }
                     }
                 });
@@ -180,9 +171,13 @@
                     var data = { mode: mode, roomId: self.roomId}
                     editor.session.setMode("ace/mode/" + mode);
                     socket.emit('mode_change', data);
+
+                    //save document
+                    self.saveDocument();
                 });
             };
 
+            //send messages
             this.sendMessage = function(el){
                 var self = this;
                 var source = $('#tpl-chat-message').html();
@@ -207,6 +202,22 @@
 
                 //emit message to all users
                 socket.emit('message_send', context);
+            };
+
+            this.saveDocument = function(){
+                var marker = {};
+                var mode = $('#l-mode').val();
+
+                marker = editor.getCursorPosition();
+                marker.key = self.userEmail;
+
+                socket.emit('editor_change',
+                    {
+                      roomId: self.roomId,
+                      newText: editor.getValue(),
+                      marker: marker,
+                      mode: mode
+                    });
             };
 
             this.init();
