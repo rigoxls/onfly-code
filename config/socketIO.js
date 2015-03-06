@@ -91,7 +91,7 @@ var SocketIO = function(config){
         });
 
         socket.on('mode_change', function(data){
-            socket.broadcast.to(data.roomId).emit('set_mode', data)
+            socket.broadcast.to(data.roomId).emit('mode_broadcast', data)
         });
 
         //when any socket lost connection, 'reload, leave page, etc...'
