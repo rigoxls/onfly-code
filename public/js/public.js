@@ -17,6 +17,7 @@
         var OFC;
         var editor = OFlyCode.CONSTANTS.editor;
         var sessionSetted = OFlyCode.CONSTANTS.sessionSetted;
+        var Range = OFlyCode.CONSTANTS.range;
 
         //create a connection with socket, by default io variable is sponsor by socket lib
         var socket = io.connect('http://localhost:3000');
@@ -28,6 +29,7 @@
             this.userAvatar = config.userAvatar;
             this.userName = config.userName;
             this.userEmail = config.userEmail;
+            this.markers = [];
 
             this.init = function(){
                 self.initEditor();
@@ -52,8 +54,6 @@
                 socket.on('editor_broadcast', function(data){
 
                     var newText = ' ';
-                    //console.info('editor broadcast gotten');
-                    //console.info(data.newText);
 
                     editor.silence = true;
 
@@ -62,6 +62,16 @@
                     editor.moveCursorToPosition(cursorPos);
 
                     editor.silence = false;
+                    editor.getSession().addGutterDecoration(0,"error_line");
+
+                    //setting markers
+                    if(data.marker && data.marker.row){
+                        var dM = data.marker;
+                        //delete self.markers[data.marker.key];
+                        editor.session.removeMarker(self.markers[dM.key]);
+                        self.markers[dM.key] = editor.session.addMarker(new Range(dM.row, 0, dM.row, 100), "foreign-marker", "fullLine");
+                    }
+
                 });
 
                 //detects any message sent by others users and update chat
@@ -115,14 +125,20 @@
 
                 //when editor change, fire an emit to info all users something has changed
                 editor.getSession().on('change', function(e) {
+
+                    var marker = {};
+
                     if(sessionSetted){
                         if (editor.curOp && editor.curOp.command.name || !editor.silence){
-                            //console.info('editor change sent');
-                            //console.info(e);
+
+                            marker = editor.getCursorPosition();
+                            marker.key = self.userEmail;
+
                             socket.emit('editor_change',
                                 {
+                                  roomId: self.roomId,
                                   newText: editor.getValue(),
-                                  roomId: self.roomId
+                                  marker: marker
                                 });
                         }
                     }

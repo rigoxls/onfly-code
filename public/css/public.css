@@ -4,6 +4,10 @@ body {
     color: #444;
 }
 
+h4.error{
+    color: #890014 !important;
+}
+
 #login{
     height: 310px;
     width: 400px;
@@ -112,6 +116,8 @@ li img{
     margin-right: 6px;
 }
 
-h4.error{
-    color: #890014 !important;
+.foreign-marker{
+    position:absolute;
+    background:rgba(170, 249, 230, 0.4);
 }
+
