@@ -48,11 +48,12 @@
                 //roomId gotten from template
                 socket.emit('create', self.roomId, self.userEmail);
 
+                //detects any change on editor and update it
                 socket.on('editor_broadcast', function(data){
 
                     var newText = ' ';
-                    console.info('editor broadcast gotten');
-                    console.info(data.newText);
+                    //console.info('editor broadcast gotten');
+                    //console.info(data.newText);
 
                     editor.silence = true;
 
@@ -61,10 +62,9 @@
                     editor.moveCursorToPosition(cursorPos);
 
                     editor.silence = false;
-
                 });
 
-                //get message sent by other users
+                //detects any message sent by others users and update chat
                 socket.on('message_broadcast', function(data){
                     var source = $('#tpl-chat-message').html();
                     var template = Handlebars.compile(source);
@@ -78,8 +78,8 @@
                     $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
                 });
 
-                //set document, stored data
-                socket.on('set_session', function(data){
+                //set document, first time
+                socket.on('set_document', function(data){
                     if(sessionSetted === false){
                         if(data.content.length > 0){
                             editor.setValue(data.content, 1);
@@ -88,11 +88,7 @@
                     }
                 });
 
-                //if invalid session redirects
-                socket.on('invalid_session', function(){
-                    window.location.href = '/home/invalid_session';
-                });
-
+                //set messages on chat, first time
                 socket.on('set_chat_messages', function(data){
 
                     var source = $('#tpl-chat-message').html();
@@ -117,11 +113,12 @@
 
                 });
 
+                //when editor change, fire an emit to info all users something has changed
                 editor.getSession().on('change', function(e) {
                     if(sessionSetted){
                         if (editor.curOp && editor.curOp.command.name || !editor.silence){
-                            console.info('editor change sent');
-                            console.info(e);
+                            //console.info('editor change sent');
+                            //console.info(e);
                             socket.emit('editor_change',
                                 {
                                   newText: editor.getValue(),
@@ -129,6 +126,11 @@
                                 });
                         }
                     }
+                });
+
+                //if invalid session redirects
+                socket.on('invalid_session', function(){
+                    window.location.href = '/home/invalid_session';
                 });
 
             }; //end initSocketEvents

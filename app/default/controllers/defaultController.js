@@ -14,7 +14,7 @@ var Default = function(){
 Default.prototype.home = function(req, res, next, io){
 
     var roomId = req.params.id || 0;
-    var errorMessage = (roomId == 'invalid_session') ? 'You have another session started !!' : '';
+    var errorMessage = (roomId == 'invalid_session') ? 'You have another session started in this room !!' : '';
 
     var object = {roomId: roomId, errorMessage: errorMessage};
     res.render('home', object);

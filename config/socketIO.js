@@ -13,30 +13,22 @@ var SocketIO = function(config){
 
     io.sockets.on('connection', function(socket){
 
-        socket.on('disconnect', function(){
-            //remove user from users connected
-            delete usersConnected[socket.uKey];
-        });
-
-        //create a room if it does not exists
+        //create a room in socket.io , if it does not exists
+        //if it exists just join the room
         socket.on('create', function(roomId, userEmail){
             socket.join(roomId);
 
             var data = { roomId : roomId };
 
+            //find room saved previously on controller
             self.model.findByRoomId(data, function(doc){
-                self.restoreChat(roomId, doc[0], socket);
-
 
                 var uKey = roomId + userEmail;
                 socket.uKey = uKey;
 
                 if(typeof usersConnected[uKey] == 'undefined'){
-                    //emit to current socket
-                    socket.emit('set_session',
-                    {
-                        content: doc[0].content
-                    });
+                    //restore chat and document
+                    self.restoreDocument(roomId, doc[0], socket);
 
                     //add user to usersConnected to avoid user twice in same room
                     usersConnected[uKey] = userEmail;
@@ -60,12 +52,14 @@ var SocketIO = function(config){
                         content: data.newText
                     };
 
-                    //save editor document
-                    self.model.saveRoom(dataRoom, 'update', function(doc){
-                        console.info("document was updated, need to improve");
-                    });
+                    //save dataRoom on all active sockets
+                    var activeSockets = io.sockets.in(data.roomId).sockets;
+                    for(var i in activeSockets){
+                        activeSockets[i].dataRoom = dataRoom;
+                    }
                 }
 
+                //broadcast change on document to all active sockets
                 socket.broadcast.to(data.roomId).emit('editor_broadcast',
                 {
                     newText: data.newText,
@@ -96,15 +90,36 @@ var SocketIO = function(config){
 
         });
 
+        //when any socket lost connection, 'reload, leave page, etc...'
+        socket.on('disconnect', function(){
+            //remove user from users connected
+            delete usersConnected[socket.uKey];
+
+            var dataRoom = socket.dataRoom || null;
+
+            if(dataRoom){
+                //save editor document
+                self.model.saveRoom(dataRoom, 'update', function(doc){
+                    console.info("document was updated");
+                });
+            }
+        });
+
     }); //end socketio connection method
 
     // this should be in a service , dirty for the moment :(
-    this.restoreChat = function(roomId, doc, socket){
+    this.restoreDocument = function(roomId, doc, socket){
 
         var data = null,
             messages = doc.messages,
             users = doc.users;
             cleanData = [];
+
+        //set document to current socket
+        socket.emit('set_document',
+        {
+            content: doc.content
+        });
 
         //search users into doc, and create a simple array with them
         for(var i in users){
