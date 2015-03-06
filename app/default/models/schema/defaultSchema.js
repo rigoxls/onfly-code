@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 var defaultSchema = new Schema({
     roomId: { type: String, require: true },
     content: String,
+    mode: String,
     messages: [ {
                     userEmail: String,
                     message: String,

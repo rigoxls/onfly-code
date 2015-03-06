@@ -52,7 +52,6 @@
 
                 //detects any change on editor and update it
                 socket.on('editor_broadcast', function(data){
-
                     var newText = ' ';
 
                     editor.silence = true;
@@ -93,6 +92,7 @@
                     if(sessionSetted === false){
                         if(data.content.length > 0){
                             editor.setValue(data.content, 1);
+                            editor.session.setMode("ace/mode/" + data.mode);
                         }
                         sessionSetted = true;
                     }
@@ -100,7 +100,6 @@
 
                 //set messages on chat, first time
                 socket.on('set_chat_messages', function(data){
-
                     var source = $('#tpl-chat-message').html();
                     var template = Handlebars.compile(source);
                     var context = null;
@@ -125,8 +124,8 @@
 
                 //when editor change, fire an emit to info all users something has changed
                 editor.getSession().on('change', function(e) {
-
                     var marker = {};
+                    var mode = $('#l-mode').val();
 
                     if(sessionSetted){
                         if (editor.curOp && editor.curOp.command.name || !editor.silence){
@@ -138,11 +137,19 @@
                                 {
                                   roomId: self.roomId,
                                   newText: editor.getValue(),
-                                  marker: marker
+                                  marker: marker,
+                                  mode: mode
                                 });
                         }
                     }
                 });
+
+                //set language mode
+                socket.on('set_mode', function(data){
+                    console.info(data);
+                    $('#l-mode').val(data.mode);
+                    editor.session.setMode("ace/mode/" + data.mode);
+                })
 
                 //if invalid session redirects
                 socket.on('invalid_session', function(){
@@ -166,6 +173,13 @@
                 $('#send').click(function(){
                     self.sendMessage(textArea);
                     textArea.val('');
+                });
+
+                $('#l-mode').change(function(e){
+                    var mode = $(this).val();
+                    var data = { mode: mode, roomId: self.roomId}
+                    editor.session.setMode("ace/mode/" + mode);
+                    socket.emit('mode_change', data);
                 });
             };
 

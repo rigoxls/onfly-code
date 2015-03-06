@@ -49,10 +49,12 @@ var SocketIO = function(config){
 
                     var dataRoom = {
                         roomId: data.roomId,
-                        content: data.newText
+                        content: data.newText,
+                        mode: data.mode
                     };
 
                     //save dataRoom on all active sockets
+                    //when user disconnect we use this data to save in db
                     var activeSockets = io.sockets.in(data.roomId).sockets;
                     for(var i in activeSockets){
                         activeSockets[i].dataRoom = dataRoom;
@@ -73,7 +75,6 @@ var SocketIO = function(config){
         //send message to all users
         socket.on('message_send', function(data){
             socket.broadcast.to(data.roomId).emit('message_broadcast', data);
-
             var dataRoom = {
                 roomId: data.roomId,
                 $push: {
@@ -83,12 +84,14 @@ var SocketIO = function(config){
                        }
                 }
             };
-
             //save message
             self.model.saveRoom(dataRoom, 'update', function(doc){
                 console.info("message saved");
             });
+        });
 
+        socket.on('mode_change', function(data){
+            socket.broadcast.to(data.roomId).emit('set_mode', data)
         });
 
         //when any socket lost connection, 'reload, leave page, etc...'
@@ -119,7 +122,8 @@ var SocketIO = function(config){
         //set document to current socket
         socket.emit('set_document',
         {
-            content: doc.content
+            content: doc.content,
+            mode: doc.mode
         });
 
         //search users into doc, and create a simple array with them
