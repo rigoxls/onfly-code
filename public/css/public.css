@@ -8,19 +8,6 @@ h4.error{
     color: #890014 !important;
 }
 
-#login{
-    height: 310px;
-    width: 400px;
-    margin: -150px 0 0 -230px;
-    padding: 30px;
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 7px 9px 70px;
-}
-
 input:not(#text-area){
     padding: 15px 15px 15px 15px;
     margin: 0 0 10px 0;
@@ -35,6 +22,47 @@ input[type=submit]{
 
 fieldset{
     border : none;
+}
+
+ul.chat-list{
+    padding:0;
+    list-style: none;
+}
+
+li.line{
+    border: 1px solid;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    min-height: 20px;
+}
+
+li.right{
+    margin-left:35px;
+    background-color: #0667A4;
+
+}
+
+li.left{
+    margin-right:35px;
+    background-color: #2f2f5f;
+}
+
+li img{
+    float: left;
+    margin-right: 6px;
+}
+
+#login{
+    height: 310px;
+    width: 400px;
+    margin: 0 auto;
+    top: 150px;
+    padding: 30px;
+    position: relative;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 7px 9px 70px;
 }
 
 #editor {
@@ -87,34 +115,6 @@ fieldset{
     padding: 2px 25px;
 }
 
-ul.chat-list{
-    padding:0;
-    list-style: none;
-}
-
-li.line{
-    border: 1px solid;
-    padding: 5px;
-    margin: 5px;
-    border-radius: 5px;
-    min-height: 20px;
-}
-
-li.right{
-    margin-left:35px;
-    background-color: #0667A4;
-
-}
-
-li.left{
-    margin-right:35px;
-    background-color: #2f2f5f;
-}
-
-li img{
-    float: left;
-    margin-right: 6px;
-}
 
 .foreign-marker{
     position:absolute;
@@ -137,7 +137,7 @@ li img{
     left: 80%;
     position: absolute;
     margin: 7px;
-    background-color: #2f2f5f;
+    background-color: #333333;
     width: 19%;
     top: 0px;
     text-align: center;
@@ -150,5 +150,3 @@ li img{
     font-size: 12px;
     padding-right: 7px;
 }
-
-
