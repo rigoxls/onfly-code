@@ -38,8 +38,7 @@ var env = process.env.NODE_ENV || 'production',
             this.expressServer.set('view cache', false);
             swig.setDefaults({cache: false, varControls: ['[[' , ']]']});
         }else{
-            console.info(env);
-            console.info('mienda');
+            console.info('this is production environment');
         }
 };
 

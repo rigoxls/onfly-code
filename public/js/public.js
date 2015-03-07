@@ -20,11 +20,12 @@
         var Range = OFlyCode.CONSTANTS.range;
 
         //create a connection with socket, by default io variable is sponsor by socket lib
-        var socket = io.connect('http://localhost:3000');
+        var socket = io.connect(self.urlApp);
 
         OFC = function(config){
 
             var self = this;
+            this.urlApp = config.urlApp;
             this.roomId = config.roomId;
             this.userAvatar = config.userAvatar;
             this.userName = config.userName;
@@ -237,7 +238,8 @@ var params = {
     userName : userName,
     userEmail: userEmail,
     userAvatar : userAvatar,
-    roomId: roomId
+    roomId: roomId,
+    urlApp: urlApp
 };
 
 new OFlyCode.OFC(params);

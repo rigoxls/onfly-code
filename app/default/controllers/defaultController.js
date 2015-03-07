@@ -1,4 +1,5 @@
 var randomToken = require('random-token'),
+    conf = require('../../../config/conf'),
     DefaultModel = require('../models/defaultModel'),
     _ = require('lodash');
 
@@ -16,7 +17,7 @@ Default.prototype.home = function(req, res, next, io){
     var roomId = req.params.id || 0;
     var errorMessage = (roomId == 'invalid_session') ? 'You have another session started in this room !!' : '';
 
-    var object = {roomId: roomId, errorMessage: errorMessage};
+    var object = {roomId: roomId, errorMessage: errorMessage, appUrl: conf.appUrl};
     res.render('home', object);
 };
 
@@ -149,7 +150,8 @@ Default.prototype.room = function(req, res, next, io){
             roomId: roomId,
             userName: req.session.userName,
             userAvatar: req.session.userAvatar,
-            userEmail: req.session.userEmail
+            userEmail: req.session.userEmail,
+            appUrl: conf.appUrl
         };
         res.render('room', object);
     }
