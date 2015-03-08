@@ -65,7 +65,8 @@ var SocketIO = function(config){
                 socket.broadcast.to(data.roomId).emit('editor_broadcast',
                 {
                     newText: data.newText,
-                    marker: data.marker
+                    marker: data.marker,
+                    dinamicText: data.dinamicText
                 });
             }else{
                 console.error("Error emiting event from room is sending an empty value, editor_change");

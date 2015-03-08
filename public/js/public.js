@@ -95,9 +95,31 @@
 
                     editor.silence = true;
 
-                    var cursorPos = editor.getCursorPosition();
-                    editor.setValue(data.newText, 1);
-                    editor.moveCursorToPosition(cursorPos);
+                    if(data.dinamicText && data.dinamicText.action !== null){
+                        if(data.dinamicText.action == "insertText"){
+                            //console.info('insert');
+                            //console.info(data.dinamicText);
+                            editor.session.insert({
+                                row: data.dinamicText.sRow,
+                                column: data.dinamicText.sColumn
+                            }, data.dinamicText.newText);
+                        }
+                        else{
+                            //console.info('remove');
+                            //console.info(data.dinamicText);
+                            editor.session.remove(new Range(
+                                data.dinamicText.sRow,
+                                data.dinamicText.sColumn,
+                                data.dinamicText.eRow,
+                                data.dinamicText.eColumn
+                            ));
+                        }
+                    }
+                    else{
+                        var cursorPos = editor.getCursorPosition();
+                        editor.setValue(data.newText, 1);
+                        editor.moveCursorToPosition(cursorPos);
+                    }
 
                     editor.silence = false;
                     editor.getSession().addGutterDecoration(0,"error_line");
@@ -149,7 +171,7 @@
                     if(sessionSetted){
                         if (editor.curOp && editor.curOp.command.name || !editor.silence){
                             //save document
-                            self.saveDocument();
+                            self.saveDocument(e);
                         }
                     }
                 });
@@ -205,19 +227,35 @@
                 socket.emit('message_send', context);
             };
 
-            this.saveDocument = function(){
+            this.saveDocument = function(e){
                 var marker = {};
                 var mode = $('#l-mode').val();
+                var dinamicText = null;
 
                 marker = editor.getCursorPosition();
                 marker.key = self.userEmail;
+
+                //if lines action could be remove or insert many lines, copy and paste
+                //in that case is better update all document
+                //otherwise we just update line user is changing in all session documents
+                if(e && e.data && e.data.lines == undefined){
+                    var dinamicText = {
+                        sRow: e.data.range.start.row,
+                        sColumn: e.data.range.start.column,
+                        eRow: e.data.range.end.row,
+                        eColumn: e.data.range.end.column,
+                        action: e.data.action,
+                        newText: e.data.text
+                    }
+                }
 
                 socket.emit('editor_change',
                     {
                       roomId: self.roomId,
                       newText: editor.getValue(),
                       marker: marker,
-                      mode: mode
+                      mode: mode,
+                      dinamicText: dinamicText
                     });
             };
 
