@@ -1,6 +1,7 @@
 var Io = require('socket.io'),
     DefaultModel = require('../app/default/models/defaultModel'),
     _ = require('lodash'),
+    gRooms = [],
     usersConnected = [];
 
 var SocketIO = function(config){
@@ -52,6 +53,12 @@ var SocketIO = function(config){
                         content: data.newText,
                         mode: data.mode
                     };
+
+                    //update general rooms array to make a persistent temporal data
+                    //it's useful to avoid saving on db per every change on document
+                    //and have a variable with data of editor for new users that could
+                    //join the session
+                    gRooms[data.roomId] = data.newText;
 
                     //save dataRoom on all active sockets
                     //when user disconnect we use this data to save in db
@@ -107,7 +114,14 @@ var SocketIO = function(config){
                 self.model.saveRoom(dataRoom, 'update', function(doc){
                     console.info("document was updated");
                 });
+
+                //active users in room, if undefined remove gRooms var position
+                if(io.nsps['/'].adapter.rooms[dataRoom.roomId] !== undefined){
+                    delete gRooms[dataRoom.roomId];
+                    console.info('gRoom deleted: ' + dataRoom.roomId);
+                }
             }
+
         });
 
     }); //end socketio connection method
@@ -123,7 +137,7 @@ var SocketIO = function(config){
         //set document to current socket
         socket.emit('set_document',
         {
-            content: doc.content,
+            content: gRooms[doc.roomId] || doc.content,
             mode: doc.mode
         });
 
