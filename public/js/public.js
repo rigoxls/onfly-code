@@ -62,6 +62,9 @@
                             $('#l-mode').val(data.mode);
                         }
                         sessionSetted = true;
+
+                        //disable loading pane
+                        $('.loading-pane').hide();
                     }
                 });
 
