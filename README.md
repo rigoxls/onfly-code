@@ -13,6 +13,7 @@ Installing
 Clone or download the code and unzip it.
 
 * run npm install
+* set database configuration in config/conf.json
 * run it typing node server.js inside main folder
 
 
