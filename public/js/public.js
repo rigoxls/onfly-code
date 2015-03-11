@@ -47,9 +47,15 @@
 
             this.initSocketEvents = function(){
                 var self = this;
+                var userInChat = {
+                    userEmail: self.userEmail,
+                    userName: self.userName,
+                    userAvatar: self.userAvatar
+                }
+
                 //join room and update content,
                 //roomId gotten from template
-                socket.emit('create', self.roomId, self.userEmail);
+                socket.emit('create', self.roomId, userInChat);
 
                 //set document, first time
                 socket.on('set_document', function(data){
@@ -143,7 +149,14 @@
                     var template = Handlebars.compile(source);
 
                     var context = data;
-                    context.bubblePosition = 'left';
+
+                    if(data && data.type){
+                        context.bubblePosition = data.type;
+                    }
+                    else{
+                        context.bubblePosition = 'left';
+                    }
+
                     var html = template(context);
                     $('#chat-box .chat-list').append(html);
 

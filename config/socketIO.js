@@ -16,15 +16,16 @@ var SocketIO = function(config){
 
         //create a room in socket.io , if it does not exists
         //if it exists just join the room
-        socket.on('create', function(roomId, userEmail){
+        socket.on('create', function(roomId, userInChat){
             socket.join(roomId);
 
             var data = { roomId : roomId };
+            var uc = userInChat;
 
             //find room saved previously on controller
             self.model.findByRoomId(data, function(doc){
 
-                var uKey = roomId + userEmail;
+                var uKey = roomId + uc.userEmail;
                 socket.uKey = uKey;
 
                 if(typeof usersConnected[uKey] == 'undefined'){
@@ -32,7 +33,25 @@ var SocketIO = function(config){
                     self.restoreDocument(roomId, doc[0], socket);
 
                     //add user to usersConnected to avoid user twice in same room
-                    usersConnected[uKey] = userEmail;
+                    usersConnected[uKey] = uc.userEmail;
+
+                    //save in socket current user
+                    socket.currentUser = {
+                        roomId: roomId,
+                        userName: uc.userName,
+                        userEmail: uc.userEmail,
+                        userAvatar: uc.userAvatar
+                    }
+
+                    var joinedUser = {
+                        userName: uc.userName,
+                        userEmail: uc.userEmail,
+                        userAvatar: uc.userAvatar,
+                        message: 'has joined this room',
+                        type: 'info'
+                    };
+
+                    socket.broadcast.to(data.roomId).emit('message_broadcast', joinedUser);
                 }
                 else{
                     //users is trying to sign in twice in same room
@@ -107,6 +126,7 @@ var SocketIO = function(config){
             //remove user from users connected
             delete usersConnected[socket.uKey];
 
+            //if socket dataRoom means user has changed something in document
             var dataRoom = socket.dataRoom || null;
 
             if(dataRoom){
@@ -120,6 +140,19 @@ var SocketIO = function(config){
                     delete gRooms[dataRoom.roomId];
                     console.info('gRoom deleted: ' + dataRoom.roomId);
                 }
+            }
+
+            //send a broadcast message info about user has left the room
+            if(socket && socket.currentUser){
+                var leftUser = {
+                    userName: socket.currentUser.userName,
+                    userEmail: socket.currentUser.userEmail,
+                    userAvatar: socket.currentUser.userAvatar,
+                    message: 'has left this room',
+                    type: 'info'
+                };
+
+                socket.broadcast.to(socket.currentUser.roomId).emit('message_broadcast', leftUser);
             }
 
         });

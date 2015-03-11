@@ -48,6 +48,12 @@ li.left{
     background-color: #2f2f5f;
 }
 
+li.info{
+    color: #111111;
+    margin-right:35px;
+    background-color: darkgray !important;
+}
+
 li img{
     float: left;
     margin-right: 6px;
